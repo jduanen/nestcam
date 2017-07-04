@@ -10,6 +10,11 @@
 #### * enable logging and put logs into the code (instead of prints)
 #### * make the get/set camera capabilities methods work
 #### * restrict testing mode and do all prints with logs
+#### * figure out notifications and add them -- including which devices are getting notifications from a camera
+#### * figure out how to get clips from camera (if possible without the service)
+#### * figure out how to get events from camera (if possible without the service),
+####   including motion and sound events
+
 
 import argparse
 from datetime import datetime
