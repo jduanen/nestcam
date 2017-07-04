@@ -1,4 +1,4 @@
-####!/usr/bin/python
+#!/usr/bin/python
 ####!/cygdrive/c/Python27/python
 
 """Nest Cam Tool"""
@@ -29,7 +29,7 @@ import yaml
 
 # default configuraton
 config = {
-    "testing": False,
+    "testing": True,
     "delay": 10 * 60,   # 10 mins
     "maxFrames": 10,    # keep last 10 frames
     "numFrames": 0,	    # capture forever
@@ -74,8 +74,6 @@ class Camera(object):
         json.dump(self.info, sys.stdout, indent=4, sort_keys=True)
         print("\n")
 
-    #### TODO methods for events -- get last, wait for, log, etc.
-
     #### TODO method to grab a frame -- on event, periodically, log to file,...
     #### TODO figure out what to do with the seconds arg
     ####      (i.e.,: when to capture image in seconds from epoch)
@@ -93,6 +91,21 @@ class Camera(object):
             raise ConnectionError('Unable to get image from camera')
         image = r.content
         return image
+
+    #### TODO methods for events -- get last, wait for, log, etc.
+    def getEvents(self, startTime, endTime=None):
+        if not endTime:
+            endTime = int(time.time())
+        path = "https://nexusapi.camera.home.nest.com/get_cuepoint"
+        params = "uuid={0}&start_time={1}&end_time={2}".format(self.uuid,
+                                                               startTime,
+                                                               endTime)
+        r = requests.get(path, params=params, cookies=self.cookies)
+        r.raise_for_status()
+        print("RESPONSE: {0}\n".format(r))
+        return r.json()
+
+    #### TODO methods for events -- get last, wait for, log, etc.
 
 
 # Encapsulation of the cameras and structures associated with a Nest account
@@ -315,7 +328,9 @@ def main():
                 val = cam.getCapability(capa)
                 print("Capability: {0}={1}".format(capa, val))
             '''
-            pass
+            events = cam.getEvents(0)
+            print("Events:")
+            json.dumps(events, sys.stdout, indent=4, sort_keys=True)
         return
 
     # capture a frame from each camera in the list, writing the images to
